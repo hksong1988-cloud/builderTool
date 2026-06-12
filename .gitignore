@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+build/
+dist/
+nvm_err.txt
+nvm_out.txt
+.idea/
+.vscode/
+.gemini/

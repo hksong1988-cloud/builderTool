@@ -1322,6 +1322,9 @@ class MainWindow(QMainWindow):
             QMessageBox.information(self, "提示", "没有其他可删除的分支（当前分支无法删除）")
             return
 
+        # 获取远端分支列表以用于存在性判断
+        remotes = [self.remote_list.item(i).text().strip() for i in range(self.remote_list.count())]
+
         # 弹出选择对话框
         dlg = QDialog(self)
         dlg.setWindowTitle("删除分支")
@@ -1330,6 +1333,11 @@ class MainWindow(QMainWindow):
         branch_picker = QComboBox()
         branch_picker.addItems(all_branches)
         dlg_lay.addWidget(branch_picker)
+
+        # 远端分支存在性状态提示
+        status_label = QLabel()
+        dlg_lay.addWidget(status_label)
+
         dlg_lay.addWidget(QLabel("删除范围："))
         r_local  = QRadioButton("仅本地")
         r_remote = QRadioButton("仅远端（origin）")
@@ -1339,6 +1347,25 @@ class MainWindow(QMainWindow):
         for rb in (r_local, r_remote, r_both):
             grp.addButton(rb)
             dlg_lay.addWidget(rb)
+
+        def update_remote_status(target_branch):
+            target_branch = target_branch.strip()
+            # 只要远端分支列表中任意一项以 /target_branch 结尾，就说明存在远端分支
+            has_remote = any(r.endswith(f"/{target_branch}") for r in remotes)
+            if has_remote:
+                status_label.setText("提示：<span style='color:green; font-weight:bold;'>✔ 存在对应的远端分支</span>")
+                r_remote.setEnabled(True)
+                r_both.setEnabled(True)
+                r_both.setChecked(True)
+            else:
+                status_label.setText("提示：<span style='color:#e67e22; font-weight:bold;'>⚠ 远端不存在该分支</span>")
+                r_remote.setEnabled(False)
+                r_both.setEnabled(False)
+                r_local.setChecked(True)
+
+        branch_picker.currentTextChanged.connect(update_remote_status)
+        update_remote_status(branch_picker.currentText())
+
         btns = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         btns.button(QDialogButtonBox.Ok).setText("确认删除")
         btns.button(QDialogButtonBox.Cancel).setText("取消")

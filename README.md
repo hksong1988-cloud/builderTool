@@ -1,6 +1,8 @@
 # builderTool - Git 多项目分支管理工具
 
-一个 PyQt5 桌面工具，用于集中管理工作目录（如 `haimanyun`）下的多个 Git 项目。
+一个 PyQt5 桌面工具，用于集中管理工作目录下的多个 Git 项目。
+
+![软件主界面](assets/interface.png)
 
 ## 功能
 
